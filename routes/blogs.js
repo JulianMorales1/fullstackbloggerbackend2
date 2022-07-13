@@ -50,6 +50,21 @@ router.get('/all-blogs', async function (req, res, next) {
 	const filterField = req.query.filterField;
 	const filterValue = req.query.filterValue;
 
+
+
+	//Validation
+	let dbLimit = limit
+	if (!limit) {
+		dbLimit = 100
+	}
+	
+	let dbSkip = skip
+	if (!skip) {
+		dbSkip = 0
+	}
+
+
+
 	let filterObj = {};
 	if (filterField && filterValue) {
 		filterObj = { [filterField]: filterValue };
@@ -60,13 +75,14 @@ router.get('/all-blogs', async function (req, res, next) {
 	}
 
 	const db = blogsDB();
-
-	const result = await db // for some reason, data is not comming from database,, please check here
-		.collection('blogs')
-		.find(filterObj)
+	const collection =  await db.collection('blogs')
+	console.log(collection)
+	console.log(await collection.find({}).toArray())
+	 // for some reason, data is not comming from database,, please check here
+	const result = await collection.find(filterObj)
 		.sort(sortObj)
-		.limit(limit)
-		.skip(skip)
+		.limit(dbLimit)
+		.skip(dbSkip)
 		.toArray();
 
 	res.send({
